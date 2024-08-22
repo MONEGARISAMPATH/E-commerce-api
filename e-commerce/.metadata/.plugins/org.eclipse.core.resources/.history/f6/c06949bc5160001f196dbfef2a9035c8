@@ -1,0 +1,6 @@
+package com.e_commerce.CategoryService.ExceptionHandler;
+
+public class PaymentNotFoundException   extends RuntimeException {
+    public PaymentNotFoundException(String message) {
+        super(message);
+    }

@@ -1,0 +1,13 @@
+package com.e_commerce.CategoryService.Clients;
+
+import org.springframework.cloud.openfeign.FeignClient;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+@FeignClient(name = "PRODUCTSERVICE")
+public interface ProductFeginClient {
+	@GetMapping("/id/{id}")
+	public String productfindById(@PathVariable Long id);
+
+}

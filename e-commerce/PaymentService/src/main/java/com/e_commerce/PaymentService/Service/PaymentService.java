@@ -1,0 +1,74 @@
+package com.e_commerce.PaymentService.Service;
+import java.util.List;
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.e_commerce.PaymentService.Clients.OrderServiceClient;
+import com.e_commerce.PaymentService.Entity.Payment;
+import com.e_commerce.PaymentService.GlobalExceptionHandler.PaymentNotFoundException;
+import com.e_commerce.PaymentService.PaymentDto.PaymentDto;
+import com.e_commerce.PaymentService.Repository.PaymentRepository;
+
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
+@Service
+public class PaymentService {
+	private static final Logger log = LoggerFactory.getLogger(PaymentService.class);
+
+	@Autowired
+	OrderServiceClient orderServiceClient;
+	@Autowired
+	PaymentRepository paymentRepository;
+
+	public Payment createPayment(Payment payment) {
+		return paymentRepository.save(payment);
+
+	}
+
+	public List<Payment> getAllPaymentDetials() {
+		return paymentRepository.findAll();
+	}
+
+	public Payment getPaymentById(Long id) {
+	    return paymentRepository.findById(id)
+	            .orElseThrow(() -> new PaymentNotFoundException("Payment with ID " + id + " not found"));
+	}
+
+
+	@CircuitBreaker(name = "paymentServiceOrderBreaker", fallbackMethod = "orderBreakerFallBack")
+	public Optional<PaymentDto> getPaymentById(Long id, Long OrderId) {
+		Optional<Payment> Optpayment = paymentRepository.findById(id);
+		if (Optpayment.isPresent()) {
+			Payment payment = Optpayment.get();
+			PaymentDto paymentdto = new PaymentDto();
+			paymentdto.setPayment(payment);
+			String Status = orderServiceClient.getOrderStatus(OrderId);
+			paymentdto.setOrderStatus(Status);
+			return Optional.of(paymentdto);
+		} else {
+			log.warn("Payment with ID {} not found", id);
+			return Optional.empty();
+		}
+
+	}
+
+	public Optional<PaymentDto> orderBreakerFallBack(Long id, Long OrderId, Exception e) {
+		log.error("Fallback method invoked due to: {}", e.getMessage());
+		Optional<Payment> optPayment = paymentRepository.findById(id);
+		if (optPayment.isPresent()) {
+			Payment payment = optPayment.get();
+			PaymentDto paymentdto = new PaymentDto();
+			paymentdto.setPayment(payment);
+			paymentdto.setOrderStatus("Order Status is down or unavailable");
+			return Optional.of(paymentdto);
+		} else {
+			log.warn("Payment with ID {} not found during fallback");
+			return Optional.empty();
+		}
+	}
+
+}

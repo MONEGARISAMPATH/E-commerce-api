@@ -1,0 +1,5 @@
+package com.e_commerce.CartService.Entity;
+
+public class Cart {
+
+}

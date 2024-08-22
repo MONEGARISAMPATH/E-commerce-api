@@ -1,0 +1,14 @@
+package com.e_commerce.UserService.Clients;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class OrderServiceFallBack implements OrderServiceClient {
+
+	@Override
+	public String getOrderStatus(Long orderId) {
+	
+		return "order status is unavailable:";
+	}
+
+}

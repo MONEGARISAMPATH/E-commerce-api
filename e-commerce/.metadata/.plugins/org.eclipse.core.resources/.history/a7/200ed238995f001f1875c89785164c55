@@ -1,0 +1,76 @@
+package com.e_commerce.CategoryService.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.e_commerce.CategoryService.Clients.ProductFeginClient;
+import com.e_commerce.CategoryService.Dto.CategoryDto;
+import com.e_commerce.CategoryService.Dto.ProductDto;
+import com.e_commerce.CategoryService.Entity.Category;
+import com.e_commerce.CategoryService.Repository.CategoryRepository;
+
+@Service
+public class CategoryService {
+
+	@Autowired
+	ProductFeginClient productFeginClient;
+
+	@Autowired
+	CategoryRepository categoryRepository;
+
+	public List<Category> getAllCategories(Category category) {
+		return categoryRepository.findAll();
+	}
+
+	
+
+	
+
+	public Optional<CategoryDto> getCategoryById(Long id) {
+		Category category = categoryRepository.findById(id).orElseThrow(()->new RuntimeException("Category not found"));
+		List<ProductDto> products=new ArrayList<>();
+		for(Long productId: category.getProductId()) {
+			ProductDto product=productFeginClient.getProductById(productId);
+			products.add(product);
+		}
+		CategoryDto categoryDto=new CategoryDto();
+		categoryDto.setCatId(category.getId());
+		categoryDto.setName(category.getName());
+		categoryDto.setSlug(category.getSlug());
+		categoryDto.setCreatedAt(category.getCreatedAt());
+		categoryDto.setUpdatedAt(category.getUpdatedAt());
+		categoryDto.setProductDto(products);;
+		return Optional.of(categoryDto);
+	}
+
+	public Category createCategory(Category category) {
+		return categoryRepository.save(category);
+
+	}
+
+	public Optional<Category> updateCategory(Long id, Category categoryUpadte) {
+		Optional<Category> categoryId = categoryRepository.findById(id);
+		if (categoryId.isPresent()) {
+			Category category = categoryId.get();
+			category.setName(categoryUpadte.getName());
+			category.setSlug(categoryUpadte.getSlug());
+			category.setProductId(categoryUpadte.getProductId());
+			categoryRepository.save(category);
+			return Optional.of(category);
+
+		} else {
+			return Optional.empty();
+		}
+	}
+
+	public boolean deleteCategory(Long id) {
+		categoryRepository.deleteById(id);
+		return true;
+
+	}
+
+}

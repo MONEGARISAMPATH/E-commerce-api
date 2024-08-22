@@ -1,0 +1,133 @@
+package com.e_commerce.CategoryService.Entity;
+
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import com.e_commerce.CategoryService.Dto.ProductDto;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PastOrPresent;
+
+@Entity
+public class Category {
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	private Long catId;
+	
+	
+	@NotBlank(message="Name is mandatory")
+	private String name;
+	
+	@NotBlank(message = "Slug cannot be blank")
+	private String slug;
+	@PastOrPresent(message = "Created date cannot be in the future")
+	private LocalDateTime createdAt;
+
+	@PastOrPresent(message = "Updated date cannot be in the future")
+	private LocalDateTime updatedAt;
+	
+
+	@OneToMany
+	@JoinColumn(name="categoryId",referencedColumnName="catId")
+	private List<ProductDto> product;
+
+	@PrePersist
+	public void createDate() {
+		// createdAt=LocalDateTime.now();
+		// updatedAt=LocalDateTime.now();
+		setCreatedAt(LocalDateTime.now());
+		setUpdatedAt(LocalDateTime.now());
+		setSlug(name.replace(" ", "-"));
+	}
+
+	@PreUpdate
+	public void updateDate() {
+		// createdAt=LocalDateTime.now();
+		// updatedAt=LocalDateTime.now();
+		setCreatedAt(LocalDateTime.now());
+		setUpdatedAt(LocalDateTime.now());
+		setSlug(name.replace(" ", "-"));
+	}
+	
+
+	public Category() {
+	
+	}
+
+	public Category(Long catId, @NotBlank(message = "Name is mandatory") String name,
+			@NotBlank(message = "Slug cannot be blank") String slug,
+			@PastOrPresent(message = "Created date cannot be in the future") LocalDateTime createdAt,
+			@PastOrPresent(message = "Updated date cannot be in the future") LocalDateTime updatedAt,
+			List<ProductDto> product) {
+		super();
+		this.catId = catId;
+		this.name = name;
+		this.slug = slug;
+		this.createdAt = createdAt;
+		this.updatedAt = updatedAt;
+		this.product = product;
+	}
+
+	public Long getCatId() {
+		return catId;
+	}
+
+	public void setCatId(Long catId) {
+		this.catId = catId;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getSlug() {
+		return slug;
+	}
+
+	public void setSlug(String slug) {
+		this.slug = slug;
+	}
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public LocalDateTime getUpdatedAt() {
+		return updatedAt;
+	}
+
+	public void setUpdatedAt(LocalDateTime updatedAt) {
+		this.updatedAt = updatedAt;
+	}
+
+	public List<ProductDto> getProduct() {
+		return product;
+	}
+
+	public void setProduct(List<ProductDto> product) {
+		this.product = product;
+	}
+
+
+	
+	
+	
+
+}

@@ -1,0 +1,14 @@
+package com.e_commerce.CategoryService.Clients;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class ProductServiceFallback implements ProductFeginClient  {
+
+	@Override
+	public Long getProductById(Long id) {
+		
+		return id;
+	}
+
+}

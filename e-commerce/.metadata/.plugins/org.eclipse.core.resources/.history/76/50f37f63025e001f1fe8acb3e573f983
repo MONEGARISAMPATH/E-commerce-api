@@ -1,0 +1,5 @@
+package com.e_commerce.CartService.Clients;
+
+public class OrderServiceFallBack {
+
+}

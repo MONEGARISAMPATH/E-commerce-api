@@ -1,0 +1,5 @@
+package com.e_commerce.UserService.Clients;
+
+public interface OrderServiceClient {
+
+}

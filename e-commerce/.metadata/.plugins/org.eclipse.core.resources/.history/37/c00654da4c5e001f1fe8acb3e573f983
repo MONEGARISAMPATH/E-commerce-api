@@ -1,0 +1,5 @@
+package com.e_commerce.PaymentService.Repository;
+
+public interface PaymentRepository {
+
+}

@@ -1,0 +1,44 @@
+package com.e_commerce.OrderService.OrderService;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.e_commerce.OrderService.OrderEntity.Order;
+import com.e_commerce.OrderService.OrderRepository.OrderRepository;
+
+@Service
+public class OrderService {
+	@Autowired
+	OrderRepository orderRepository;
+
+	@Transactional
+	public Order createOrder(Order order) {
+		return orderRepository.save(order);
+	}
+
+	public Optional<Order> getOrderById(Long orderId) {
+		return orderRepository.findById(orderId);
+
+	}
+
+	public String getOrderStatusById(Long orderId) {
+
+		// case:1 both are correct
+		
+		  Order order=orderRepository.findById(orderId).orElse(null); return
+		  (order!=null) ? order.getStatus() : "Order  not found"; 
+		   
+	}	
+		//case:2 
+		/*Order orderStatus = orderRepository.findById(orderId).orElse(null);
+		if (orderStatus != null)
+			return orderStatus.getStatus();
+		else
+			return "oder not found";
+
+	}*/
+
+}

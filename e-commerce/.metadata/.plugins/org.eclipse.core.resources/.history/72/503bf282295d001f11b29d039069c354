@@ -1,0 +1,54 @@
+package com.e_commerce.UserService.Service;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.e_commerce.UserService.Clients.OrderServiceClient;
+import com.e_commerce.UserService.Entity.User;
+import com.e_commerce.UserService.Repository.UserRepository;
+import com.e_commerce.UserService.UserDto.UserDto;
+
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
+@Service
+public class UserService {
+	@Autowired
+	OrderServiceClient orderServiceClient;
+	@Autowired
+	UserRepository userRepository;
+
+	public User createUser(User user) {
+		return userRepository.save(user);
+	}
+
+	@CircuitBreaker(name = "OrderBreaker", fallbackMethod = "orderBreakerFallback")
+	/*
+	 * public String getOrderStatus(Long orderId) { throw new
+	 * RuntimeException("Simulated service failure"); }
+	 */
+
+	public Optional<UserDto> getByUserId(Long id, Long orderId) {
+
+		Optional<User> userid = userRepository.findById(id);
+		
+		if(userid.isPresent()) {
+			UserDto userDto =new UserDto();
+			userDto.setUser(userid);
+			
+			String status= orderServiceClient.getOrderStatus(orderId);
+			userDto.setOrderStatus(status);
+			return Optional.of(userDto);
+		}
+			else {
+				return Optional.empty();
+			
+			}
+	}
+
+	public String orderBreakerFallback(Long orderId, Throwable throwable) {
+		return "Order status is unavailable";
+
+	}
+}

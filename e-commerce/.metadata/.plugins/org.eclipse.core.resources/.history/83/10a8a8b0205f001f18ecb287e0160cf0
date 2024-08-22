@@ -1,0 +1,83 @@
+package com.e_commerce.CategoryService.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.e_commerce.CategoryService.Clients.ProductFeginClient;
+import com.e_commerce.CategoryService.Dto.CategoryDto;
+import com.e_commerce.CategoryService.Dto.ProductDto;
+import com.e_commerce.CategoryService.Entity.Category;
+import com.e_commerce.CategoryService.Repository.CategoryRepository;
+
+@Service
+public class CategoryService {
+
+	@Autowired
+	ProductFeginClient productFeginClient;
+
+	@Autowired
+	CategoryRepository categoryRepository;
+
+	public List<Category> getAllCategories(Category category) {
+		return categoryRepository.findAll();
+	}
+
+	public Optional<?> getCategoryById(Long catId, Long id) {
+		Optional<Category> categoryId = categoryRepository.findById(catId);
+		if (categoryId.isPresent()) {
+			Category category = categoryId.get();
+			CategoryDto categoryDto = new CategoryDto();
+			categoryDto.setCategory(category);
+			
+			
+			ProductDto productdto = new ProductDto();
+			Long product = productFeginClient.getProductById(id);
+			productdto.setId(product);
+			return Optional.of(productdto);
+
+		} else {
+			return Optional.empty();
+		}
+
+	}
+
+	public Optional<Category> getCategoryById(Long catId) {
+		Optional<Category> categoryId = categoryRepository.findById(catId);
+		if (categoryId.isPresent()) {
+			Category category = categoryId.get();
+			return Optional.of(category);
+
+		} else {
+			return Optional.empty();
+		}
+	}
+
+	public Category createCategory(Category category) {
+		return categoryRepository.save(category);
+
+	}
+
+	public Optional<Category> updateCategory(Long catId, Category categoryUpadte) {
+		Optional<Category> categoryId = categoryRepository.findById(catId);
+		if (categoryId.isPresent()) {
+			Category category = categoryId.get();
+			category.setName(categoryUpadte.getName());
+			category.setSlug(categoryUpadte.getSlug());
+			category.setProduct(categoryUpadte.getProduct());
+			return Optional.of(category);
+
+		} else {
+			return Optional.empty();
+		}
+	}
+
+	public boolean deleteCategory(Long catId) {
+		categoryRepository.deleteById(catId);
+		return true;
+
+	}
+
+}

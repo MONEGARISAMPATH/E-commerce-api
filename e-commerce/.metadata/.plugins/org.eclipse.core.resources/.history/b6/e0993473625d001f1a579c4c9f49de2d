@@ -1,0 +1,22 @@
+package com.e_commerce.ProductService.ProductService;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.e_commerce.ProductService.Entity.Product;
+import com.e_commerce.ProductService.Repository.ProductRepository;
+
+@Service
+public class ProductService {
+	@Autowired
+	ProductRepository productRepository;
+	
+	public Product createProduct(Product product) {
+		return productRepository.save(product);
+	}
+	 public Optional<Product> getProductById(Long id) {
+		 return productRepository.findById(id);
+	 }
+}

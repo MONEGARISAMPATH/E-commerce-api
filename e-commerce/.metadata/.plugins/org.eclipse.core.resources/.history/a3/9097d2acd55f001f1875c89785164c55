@@ -1,0 +1,87 @@
+package com.e_commerce.CartService.Service;
+
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.e_commerce.CartService.CartDto.CartDto;
+import com.e_commerce.CartService.Clients.OrderServiceClient;
+import com.e_commerce.CartService.Entity.Cart;
+import com.e_commerce.CartService.Repository.CartRepository;
+import com.e_commerce.CartService.Responses.ResponseCartDelete;
+
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
+@Service
+public class CartService {
+	private static final Logger log = LoggerFactory.getLogger(CartService.class);
+	@Autowired
+	OrderServiceClient oderServiceClient;
+	@Autowired
+	CartRepository cartRespository;
+
+	public Cart createCart(Cart cart) {
+		return cartRespository.save(cart);
+	}
+
+	@CircuitBreaker(name = "cartServiceOrderBreaker", fallbackMethod = "orderBreakerfallBackMethod,")
+	public Optional<CartDto> getCartById(Long id, Long orderId) {
+		Optional<Cart> cartId = cartRespository.findById(id);
+		if (cartId.isPresent()) {
+			Cart cart = cartId.get();
+			CartDto cartDto = new CartDto();
+			cartDto.setCart(cart);
+			String Status = oderServiceClient.getOrderStatus(orderId);
+			cartDto.setOrderStatus(Status);
+			return Optional.of(cartDto);
+		} else {
+			log.warn("User with ID {} not found", id);
+			return Optional.empty();
+
+		}
+	}
+   //fall BackMethod for OderService 
+	public Optional<CartDto> orderBreakerfallBackMethod(Long id,Long orderId,Exception e) {
+		log.error("Fallback method invoked due to: {}", e.getMessage());
+		Optional<Cart> cartId=cartRespository.findById(id);
+		if(cartId.isPresent()) {
+			Cart cart=cartId.get();
+			CartDto cartDto=new CartDto();
+			cartDto.setCart(cart);
+			cartDto.setOrderStatus("Order Status is Down or Unavaiable");
+			return Optional.of(cartDto);
+		}else {
+			 log.warn("User with ID {} not found during fallback");
+	            return Optional.empty();
+		}
+		
+	}
+
+	public Optional<Cart> updateCart(Long id, Cart cart) {
+
+		Optional<Cart> cartId = cartRespository.findById(id);
+		if (cartId.isPresent()) {
+			Cart excistCart = cartId.get();
+			excistCart.setDescription(cart.getDescription());
+			excistCart.setTotal(cart.getTotal());
+			Cart updatedCart = cartRespository.save(excistCart);
+			return Optional.of(updatedCart);
+		} else {
+			// return cartId.orElse(null);
+			//return Optional.empty();
+			throw new RuntimeException("Cart not found" + id);
+		}
+	}
+
+	public ResponseCartDelete deleteCart(Long id) {
+		cartRespository.deleteById(id);
+		ResponseCartDelete delete = new ResponseCartDelete();
+		delete.setId(id);
+		delete.setDeleteMsg("cart Deleted !");
+		return delete;
+	}
+
+}

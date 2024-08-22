@@ -1,0 +1,63 @@
+package com.e_commerce.CartService.Controller;
+
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.e_commerce.CartService.CartDto.CartDto;
+import com.e_commerce.CartService.Entity.Cart;
+import com.e_commerce.CartService.Responses.ErrorResponse;
+import com.e_commerce.CartService.Service.CartService;
+
+import jakarta.validation.Valid;
+
+@RestController
+@RequestMapping("/cart")
+public class CartController {
+	private static final Logger log = LoggerFactory.getLogger(CartService.class);
+	
+	@Autowired
+	CartService cartService;
+
+	@PostMapping("/createCart")
+	public ResponseEntity<Cart> createCart(@Valid @RequestBody Cart cart) {
+		Cart addCart = cartService.createCart(cart);
+		return new ResponseEntity<>(addCart, HttpStatus.OK);
+	}
+	@GetMapping("/id/{id}/{orderId}")
+	public ResponseEntity<?> getCartById(@PathVariable Long id,@PathVariable Long orderId){
+		Optional<CartDto> cart=cartService.getCartById(id, orderId);
+		if(cart.isPresent()) {
+			CartDto cartDto=cart.get();
+			return new ResponseEntity<>(cartDto,HttpStatus.OK);
+		}else {
+			String errorMessage="User not found with ID: " + id;
+			log.error("Error: {} | Status: {} ",errorMessage,HttpStatus.NOT_FOUND);
+			ErrorResponse errorResponse=new ErrorResponse(errorMessage,HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(errorResponse,HttpStatus.NOT_FOUND);
+		}
+	}
+	@PutMapping("/updateCart/id/{id}")
+	public ResponseEntity<Optional<Cart>> updateCart(@PathVariable Long id,@Valid @RequestBody Cart cart){
+	Optional<Cart> cartId =cartService.updateCart(id,cart);
+	if(cartId.isPresent()) {
+		Cart updateCart=cartId.get();
+		return new ResponseEntity<>(updateCart,HttpStatus.OK);
+	}else
+		
+	}
+		
+	}
+
+

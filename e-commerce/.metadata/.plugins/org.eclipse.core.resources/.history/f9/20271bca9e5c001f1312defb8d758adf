@@ -1,0 +1,28 @@
+package com.e_commerce.OrderService.OrderController;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.e_commerce.OrderService.OrderEntity.Order;
+import com.e_commerce.OrderService.OrderService.OrderService;
+
+import jakarta.validation.Valid;
+
+@RestController
+@RequestMapping("/orders")
+public class OrderController {
+	@Autowired
+	OrderService orderService;
+	
+	
+	@PostMapping("/createOrder")
+	public ResponseEntity<Order> createOrder(@Valid  @RequestBody Order order ){
+		 return ResponseEntity.ok(orderService.createOrder(order));
+		
+	}
+
+}

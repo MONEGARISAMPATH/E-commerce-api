@@ -1,0 +1,50 @@
+spring.application.name=ApiGateway
+server.port=8086
+eureka.client.serviceUrl.defaultZone=http://localhost:8761/eureka
+
+# Spring Cloud Gateway Routes Configuration
+
+# UserService Route
+spring.cloud.gateway.routes[0].id=user-service
+spring.cloud.gateway.routes[0].uri=lb://USERSERVICE
+spring.cloud.gateway.routes[0].predicates[0]=Path=/user/**
+spring.cloud.gateway.routes[0].filters[0]=CircuitBreaker=name=OrderBreaker, fallbackUri=forward:/fallback/userService
+
+# ProductService Route
+spring.cloud.gateway.routes[1].id=PRODUCTSERVICE
+spring.cloud.gateway.routes[1].uri=lb://PRODUCTSERVICE
+spring.cloud.gateway.routes[1].predicates[0]=Path=/product/**
+spring.cloud.gateway.routes[1].filters[0]=CircuitBreaker=name=OrderBreaker, fallbackUri=forward:/fallback/productService
+
+# CartService Route
+spring.cloud.gateway.routes[2].id=CARTSERVICE
+spring.cloud.gateway.routes[2].uri=lb://CARTSERVICE
+spring.cloud.gateway.routes[2].predicates[0]=Path=/cart/**
+spring.cloud.gateway.routes[2].filters[0]=CircuitBreaker=name=cartServiceCircuitBreaker, fallbackUri=forward:/fallback/cartService
+
+# PaymentService Route
+spring.cloud.gateway.routes[3].id=PAYMENTSERVICE
+spring.cloud.gateway.routes[3].uri=lb://PAYMENTSERVICE
+spring.cloud.gateway.routes[3].predicates[0]=Path=/payments/**
+spring.cloud.gateway.routes[3].filters[0]=CircuitBreaker=name=paymentServiceCircuitBreaker, fallbackUri=forward:/fallback/paymentService
+
+
+# OrderService Route
+spring.cloud.gateway.routes[4].id=ORDERSERVICE
+spring.cloud.gateway.routes[4].uri=lb://ORDERSERVICE
+spring.cloud.gateway.routes[4].predicates[0]=Path=/order/**
+spring.cloud.gateway.routes[4].filters[0]=CircuitBreaker=name=orderServiceCircuitBreaker, fallbackUri=forward:/fallback/orderService
+
+
+# Resilience4J Circuit Breaker Configuration
+
+# Order Service Circuit Breaker
+resilience4j.circuitbreaker.instances.OrderBreaker.register-health-indicator=true
+resilience4j.circuitbreaker.instances.OrderBreaker.sliding-window-size=10
+resilience4j.circuitbreaker.instances.OrderBreaker.minimum-number-of-calls=5
+resilience4j.circuitbreaker.instances.OrderBreaker.permitted-number-of-calls-in-half-open-state=3
+resilience4j.circuitbreaker.instances.OrderBreaker.wait-duration-in-open-state=10s
+resilience4j.circuitbreaker.instances.OrderBreaker.failureRateThreshold=50
+resilience4j.circuitbreaker.instances.OrderBreaker.automatic-transition-from-open-to-half-open-enabled=true
+resilience4j.circuitbreaker.instances.OrderBreaker.sliding-window-type=COUNT_BASED
+

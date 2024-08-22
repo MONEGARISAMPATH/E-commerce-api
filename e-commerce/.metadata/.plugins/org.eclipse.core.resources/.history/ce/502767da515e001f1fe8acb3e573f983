@@ -1,0 +1,5 @@
+package com.e_commerce.PaymentService.PaymentDto;
+
+public class PaymentDto {
+
+}

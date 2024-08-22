@@ -1,0 +1,11 @@
+package com.e_commerce.UserService.Clients;
+
+public class OrderServiceFallBack implements OrderServiceClient {
+
+	@Override
+	public String getOrderStatus(Long orderId) {
+	
+		return "order status is unavailable:";
+	}
+
+}

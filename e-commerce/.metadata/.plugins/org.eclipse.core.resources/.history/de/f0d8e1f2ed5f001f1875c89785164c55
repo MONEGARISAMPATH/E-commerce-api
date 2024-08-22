@@ -1,0 +1,41 @@
+package com.e_commerce.ApiGateway.Controller;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+
+public class ApiGatewayController {
+
+	@GetMapping("/fallback/userService")
+	public ResponseEntity<String> userServiceFallBack() {
+		return new ResponseEntity<>("UserService is currently not available, Please try again later...", HttpStatus.SERVICE_UNAVAILABLE);
+	}
+
+	@GetMapping("/fallback/productService")
+	public ResponseEntity<String> productServiceFallBack() {
+		return new ResponseEntity<>("ProductService is currently not available,Please try again later..",HttpStatus.SERVICE_UNAVAILABLE);
+	}
+
+	@GetMapping("/fallback/paymentService")
+	public ResponseEntity<String> paymentServiceFallback() {
+		return new ResponseEntity<>("Payment Service is currently unavailable. Please try again later.", HttpStatus.SERVICE_UNAVAILABLE);
+	}
+
+	@GetMapping("/fallback/categoryService")
+	public ResponseEntity<String> orderServiceFallback() {
+		return new ResponseEntity<>("Category Service  is currently unavailable. Please try again later.", HttpStatus.SERVICE_UNAVAILABLE);
+	}
+
+	@GetMapping("/fallback/cartService")
+	public ResponseEntity<String> cartServiceFallback() {
+		return new ResponseEntity<>("Cart Service is currently unavailable. Please try again later.", HttpStatus.SERVICE_UNAVAILABLE);
+	}
+
+	@GetMapping("/fallback/default")
+	public ResponseEntity<String> defaultFallback() {
+		return new ResponseEntity<>("Service is currently unavailable. Please try again later.", HttpStatus.SERVICE_UNAVAILABLE);
+	}
+}

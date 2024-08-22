@@ -1,0 +1,23 @@
+package com.e_commerce.CategoryService.Dto;
+
+import com.e_commerce.CategoryService.Entity.Category;
+
+public class CategoryDto {
+	private Category category ;
+	private String status;
+	public Category getCategory() {
+		return category;
+	}
+	public void setCategory(Category category) {
+		this.category = category;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	
+
+}

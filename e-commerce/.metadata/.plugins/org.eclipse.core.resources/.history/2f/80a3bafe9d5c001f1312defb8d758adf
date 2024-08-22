@@ -1,0 +1,5 @@
+package com.e_commerce.OrderService.ErrorHandler;
+
+public class ErrorMessage {
+
+}

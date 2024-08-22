@@ -1,0 +1,103 @@
+package com.e_commerce.UserService.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.e_commerce.UserService.Clients.OrderServiceClient;
+import com.e_commerce.UserService.Entity.User;
+import com.e_commerce.UserService.Repository.UserRepository;
+import com.e_commerce.UserService.UserDto.UserDto;
+
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
+@Service
+public class UserService {
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
+
+    @Autowired
+    private OrderServiceClient orderServiceClient;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    public User createUser(User user) {
+        return userRepository.save(user);
+    }
+
+    @CircuitBreaker(name = "userServiceOrderBreaker", fallbackMethod = "orderBreakerFallBack")
+    public Optional<UserDto> getByUserId(Long id, Long orderId) {
+        Optional<User> userOpt = userRepository.findById(id);
+
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            UserDto userDto = new UserDto();
+            userDto.setUser(user);
+
+            // Fetch order status using Feign client
+            String status = orderServiceClient.getOrderStatus(orderId);
+            userDto.setOrderStatus(status);
+
+            return Optional.of(userDto);
+        } else {
+            log.warn("User with ID {} not found", id);
+            return Optional.empty();
+        }
+    }
+
+    // Fallback method for when OrderService is down
+    public Optional<UserDto> orderBreakerFallBack(Long id, Long orderId, Throwable throwable) {
+        log.error("Fallback method invoked due to: {}", throwable.getMessage());
+
+        // Retrieve user information if possible
+        Optional<User> userOpt = userRepository.findById(id);
+
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            UserDto userDto = new UserDto();
+            userDto.setUser(user);
+            userDto.setOrderStatus("Order status is unavailable");
+
+            return Optional.of(userDto);
+        } else {
+            log.warn("User with ID {} not found during fallback");
+            return Optional.empty();
+        }
+    }
+    public List<User> getAllUsers() {
+    	return userRepository.findAll();
+    }
+    public Optional<User> getUserById(Long id) {
+    	Optional<User> userId=userRepository.findById(id);
+    	if(userId.isPresent()) {
+    		User user=userId.get();
+    		return Optional.of(user);
+    	}else {
+    	log.warn("User with ID {} not found during fallback");
+    	return Optional.empty();
+    	}
+    }
+    
+    public Optional<User> updateUser(Long id,User updateUser) {
+    	Optional<User> excistUser=userRepository.findById(id);
+    	if(excistUser.isPresent()) {
+    		User userUpdated=excistUser.get();
+    		userUpdated.setName(updateUser.getName());
+    		userUpdated.setEmail(updateUser.getEmail());
+    		userUpdated.setPassword(updateUser.getPassword());
+    		return Optional.of(userUpdated);
+    	}else {
+    	log.warn("User with ID {} not found during fallback");
+    	return Optional.empty();
+    	}
+    }
+    	public boolean deleteUser(Long id) {
+    		userRepository..deleteById(id);
+    		return true;
+    	}
+    }
+}

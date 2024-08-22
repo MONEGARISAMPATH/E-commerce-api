@@ -1,0 +1,21 @@
+package com.e_commerce.UserService.Clients;
+
+import org.springframework.stereotype.Component;
+
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
+@Component
+public class OrderServiceFallBack implements OrderServiceClient {
+
+	@Override
+	@CircuitBreaker(name = "OrderBreaker", fallbackMethod = "orderBreakerFallback")
+	public String getOrderStatus(Long orderId) {
+		throw new RuntimeException("Simulated service failure");
+	}
+
+	// Fallback method
+	public String orderBreakerFallback(Long orderId, Throwable throwable) {
+		return "Order status is unavailable";
+
+	}
+}

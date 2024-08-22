@@ -1,0 +1,11 @@
+package com.e_commerce.CategoryService.Clients;
+
+public class ProductServiceFallback implements ProductFeginClient  {
+
+	@Override
+	public Long getProductById(Long id) {
+		
+		return id;
+	}
+
+}

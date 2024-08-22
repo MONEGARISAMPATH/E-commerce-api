@@ -1,0 +1,5 @@
+package com.e_commerce.PaymentService.Service;
+
+public class PaymentService {
+
+}

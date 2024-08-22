@@ -1,0 +1,54 @@
+package com.e_commerce.ProductService.ProductService;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.e_commerce.ProductService.Clients.OrderServiceClient;
+import com.e_commerce.ProductService.Entity.Product;
+import com.e_commerce.ProductService.ProductDto.ProductDto;
+import com.e_commerce.ProductService.Repository.ProductRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
+@Service
+public class ProductService {
+    @Autowired
+    OrderServiceClient orderServiceClient;
+    @Autowired
+    ProductRepository productRepository;
+
+    public Product createProduct(Product product) {
+        return productRepository.save(product);
+    }
+
+    @CircuitBreaker(name = "OrderBreaker"/* ,fallbackMethod= "orderBreakerfallBackMethod" */)
+    public Optional<ProductDto> getProductById(Long id, Long orderId) {
+        Optional<Product> productId = productRepository.findById(id);
+        if (productId.isPresent()) {
+            Product product = productId.get();
+            ProductDto productDto = new ProductDto();
+            productDto.setProduct(product);
+
+            String status = orderServiceClient.getOrderStatus(orderId);
+            productDto.setOrderStatus(status);
+            return Optional.of(productDto);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    // Optional: You can use this method as a fallback for the CircuitBreaker.
+    // public Optional<ProductDto> orderBreakerfallBackMethod(Long id, Long orderId, Exception e) {
+    //     Optional<Product> productId = productRepository.findById(id);
+    //     if (productId.isPresent()) {
+    //         Product product = productId.get();
+    //         ProductDto productDto = new ProductDto();
+    //         productDto.setProduct(product);
+    //         productDto.setOrderStatus("Order status is unavailable");
+    //         return Optional.of(productDto);
+    //     } else {
+    //         return Optional.empty();
+    //     }
+    // }
+}

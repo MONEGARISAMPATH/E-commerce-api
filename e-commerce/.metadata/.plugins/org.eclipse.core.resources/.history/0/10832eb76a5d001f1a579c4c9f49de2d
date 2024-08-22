@@ -1,0 +1,14 @@
+package com.e_commerce.ProductService.Clients;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+
+
+@FeignClient(name="PRODUCTSERVICE",fallback=OrderServiceFallBack.class)
+public interface OrderServiceClient {
+	@GetMapping("/orders/orderStatus/{orderId}")
+	String getOrderStatus(@PathVariable Long orderId);
+
+}

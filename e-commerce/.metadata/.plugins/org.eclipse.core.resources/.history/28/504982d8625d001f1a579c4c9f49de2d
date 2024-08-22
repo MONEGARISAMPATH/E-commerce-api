@@ -1,0 +1,33 @@
+package com.e_commerce.ProductService.ProductService;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.e_commerce.ProductService.Entity.Product;
+import com.e_commerce.ProductService.ProductDto.ProductDto;
+import com.e_commerce.ProductService.Repository.ProductRepository;
+
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
+@Service
+public class ProductService {
+	@Autowired
+	ProductRepository productRepository;
+	
+	public Product createProduct(Product product) {
+		return productRepository.save(product);
+	}
+	
+	@CircuitBreaker(name="OrderBreaker")
+	 public Optional<Product> getProductById(Long id,Long orderId) {
+		Optional<Product> productId= productRepository.findById(id);
+		if(productId.isPresent()) {
+			Product product=new Product();
+			product=productId.get();
+			ProductDto productDto=new ProductDto();
+			productId.setProduct(product);
+		}
+	 }
+}

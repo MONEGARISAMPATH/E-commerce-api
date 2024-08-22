@@ -1,0 +1,24 @@
+package com.e_commerce.CategoryService.Dto;
+
+import com.e_commerce.CategoryService.Entity.Category;
+
+public class CategoryDto {
+	private Category category ;
+	private Long productId;
+	public Category getCategory() {
+		return category;
+	}
+	public void setCategory(Category category) {
+		this.category = category;
+	}
+	public Long getProductId() {
+		return productId;
+	}
+	public void setProductId(Long productId) {
+		this.productId = productId;
+	}
+	
+	
+	
+
+}

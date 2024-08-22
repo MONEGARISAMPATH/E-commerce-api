@@ -1,0 +1,90 @@
+package com.e_commerce.OrderService.OrderController;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.e_commerce.OrderService.ErrorHandler.ErrorMessage;
+import com.e_commerce.OrderService.OrderEntity.Order;
+import com.e_commerce.OrderService.OrderService.OrderService;
+
+import jakarta.validation.Valid;
+
+@RestController
+@RequestMapping("/orders")
+public class OrderController {
+
+	private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
+	
+	@Autowired
+	Environment environment;
+	
+	@Autowired
+	OrderService orderService;
+	
+	@GetMapping("/port")
+	public String portNumberStatus() {
+		return "OrderService running port number is :" + " " + environment.getProperty("local.server.port");
+
+	}
+
+	@GetMapping("/")
+	public ResponseEntity<List<Order>> getAllOrders() {
+		List<Order> allOrders = orderService.getAllOrders();
+		return new ResponseEntity<>(allOrders, HttpStatus.OK);
+	}
+
+	@GetMapping("/{orderId}")
+	public ResponseEntity<?> getOrderById(@PathVariable Long orderId) {
+		Optional<Order> OrderId = orderService.getOrderById(orderId);
+		if (OrderId.isPresent()) {
+			Order order = OrderId.get();
+			return new ResponseEntity<>(order, HttpStatus.OK);
+		} else {
+			String errorMessage = "OrderId not found: " + orderId;
+			logger.error("Error: {}  | Status: {}", errorMessage, HttpStatus.NOT_FOUND);
+			ErrorMessage errorResponse = new ErrorMessage(errorMessage, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+		}
+	}
+
+	@GetMapping("/status/{orderId}")
+	public ResponseEntity<String> getOrderStatus(@PathVariable Long orderId) {
+		String orderStatus = orderService.getOrderStatusById(orderId);
+		return new ResponseEntity<>(orderStatus, HttpStatus.OK);
+	}
+
+	@PostMapping("/")
+	public ResponseEntity<Order> createOrder(@Valid @RequestBody Order order) {
+		return ResponseEntity.ok(orderService.createOrder(order));
+	}
+
+	@PutMapping("/status/{orderId}")
+	public ResponseEntity<?> upadteOrderByStatus(@PathVariable Long orderId, @Valid @RequestBody Order updateOrder) {
+		Optional<Order> orderid = orderService.updateOrder(orderId, updateOrder);
+		if (orderid.isPresent()) {
+			Order updatedOrder = orderid.get();
+			return new ResponseEntity<>(updatedOrder, HttpStatus.OK);
+		} else {
+			String errorMessage = "OrderId not found with ID: " + orderId;
+
+			logger.error("Error: {} | Status: {}", errorMessage, HttpStatus.NOT_FOUND);
+			ErrorMessage errorResponse = new ErrorMessage(errorMessage, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+		}
+
+	}
+}

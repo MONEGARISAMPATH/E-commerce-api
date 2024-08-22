@@ -1,0 +1,66 @@
+package com.e_commerce.OrderService.OrderEntity;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+
+@Entity
+@Table(name="orders")
+public class Order {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long orderId;
+	@NotNull(message="userid is mandatory")
+	private Long userId;
+	@NotNull(message="productid is mandatory")
+	private Long productId;
+	@NotNull(message="quantity is mandatory")
+	private Integer quantity;
+	@NotNull(message="status is mandatory")
+	private String status;
+
+	public Long getOderId() {
+		return orderId;
+	}
+
+	public void setOderId(Long oderId) {
+		this.orderId = oderId;
+	}
+
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+
+	public Long getProductId() {
+		return productId;
+	}
+
+	public void setProductId(Long productId) {
+		this.productId = productId;
+	}
+
+	public Integer getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(Integer quantity) {
+		this.quantity = quantity;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+}

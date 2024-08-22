@@ -1,0 +1,70 @@
+package com.e_commerce.CartService.Service;
+
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.e_commerce.CartService.CartDto.CartDto;
+import com.e_commerce.CartService.Clients.OrderServiceClient;
+import com.e_commerce.CartService.Entity.Cart;
+import com.e_commerce.CartService.Repository.CartRepository;
+import com.e_commerce.CartService.Responses.ResponseCartDelete;
+import com.e_commerce.UserService.Service.UserService;
+
+@Service
+public class CartService {
+	 private static final Logger log = LoggerFactory.getLogger(CartService.class);
+	@Autowired
+	OrderServiceClient  oderServiceClient;
+	@Autowired
+	CartRepository cartRespository;
+
+	public Cart createCart(Cart cart) {
+		return cartRespository.save(cart);
+	}
+
+	public Optional<CartDto> getCartById(Long id,Long orderId) {
+		Optional<Cart> cartId = cartRespository.findById(id);
+		if (cartId.isPresent()) {
+			Cart cart= cartId.get();
+			CartDto cartDto=new CartDto();
+			cartDto.setCart(cart);
+			String Status=oderServiceClient.getOrderStatus(orderId);
+			cartDto.setOrderStatus(Status);
+			return Optional.of(cartDto);
+		}
+		else {
+			log.warn("User with ID {} not found", id);
+            return Optional.empty();
+			
+		}
+	}
+	
+	public Cart updateCart(Long id,Cart cart) {
+		
+		Optional<Cart> cartId=cartRespository.findById(id);
+		if(cartId.isPresent()) {
+			Cart excistCart=cartId.get();
+			excistCart.setDescription(cart.getDescription());
+			excistCart.setTotal(cart.getTotal());
+		Cart updatedCart=cartRespository.save(excistCart);
+			return updatedCart;
+		}else {
+			// return cartId.orElse(null);
+			throw new RuntimeException("Cart not found" +id);
+		}
+	}
+	public ResponseCartDelete deleteCart(Long id) {
+		cartRespository.deleteById(id);
+		ResponseCartDelete delete=new ResponseCartDelete();
+		delete.setId(id);
+		delete.setDeleteMsg("cart Deleted !");
+		return delete;
+	}
+	
+	
+	
+}

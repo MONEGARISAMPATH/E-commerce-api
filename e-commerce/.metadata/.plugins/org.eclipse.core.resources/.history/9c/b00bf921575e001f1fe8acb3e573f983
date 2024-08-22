@@ -1,0 +1,5 @@
+package com.e_commerce.PaymentService.GlobalExceptionHandler;
+
+public class GlobalExceptionHandler {
+
+}

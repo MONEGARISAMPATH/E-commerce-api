@@ -1,0 +1,73 @@
+package com.e_commerce.ProductService.ProductController;
+
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.e_commerce.ProductService.Entity.ErrorResponse;
+import com.e_commerce.ProductService.Entity.Product;
+import com.e_commerce.ProductService.ProductDto.ProductDto;
+import com.e_commerce.ProductService.ProductService.ProductService;
+import jakarta.validation.Valid;
+
+@RestController
+@RequestMapping("/product")
+public class ProductController {
+    private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
+
+    @Autowired
+    ProductService Product ;
+
+    @PostMapping("/createProduct")
+    public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
+        return ResponseEntity.ok(productService.createProduct(product));
+    }
+    
+    
+    @GetMapping()
+    public ResponseEntity<Product >getAllProducts(){
+    	Product allProducts=Product .getAllProducts();
+    	return new ResponseEntity<>(allProducts);
+    }
+    @GetMapping("/id/{id}")
+    public ResponseEntity<?> getProductById(@PathVariable Long id) {
+        Optional<Product> productId = productService.getProductById(id);
+
+        if (productId.isPresent()) {
+            Product product = productId.get();
+            return new ResponseEntity<>(product, HttpStatus.OK);
+        } else {
+            String errorMessage = "Product not found with ID: " + id;
+            logger.error("Error: {} | Status: {}", errorMessage, HttpStatus.NOT_FOUND);
+            ErrorResponse errorResponse = new ErrorResponse(errorMessage, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+    }
+    
+    @GetMapping("/id/{id}/{orderId}")
+    public ResponseEntity<?> getProductById(@PathVariable Long id, @PathVariable Long orderId) {
+        Optional<ProductDto> productId = productService.getProductById(id, orderId);
+
+        if (productId.isPresent()) {
+            ProductDto productDto = productId.get();
+            return new ResponseEntity<>(productDto, HttpStatus.OK);
+        } else {
+            String errorMessage = "Product not found with ID: " + id;
+            logger.error("Error: {} | Status: {}", errorMessage, HttpStatus.NOT_FOUND);
+            ErrorResponse errorResponse = new ErrorResponse(errorMessage, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+    }
+    
+   
+}

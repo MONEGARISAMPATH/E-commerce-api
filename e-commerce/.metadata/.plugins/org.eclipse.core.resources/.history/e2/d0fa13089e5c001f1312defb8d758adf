@@ -1,0 +1,16 @@
+package com.e_commerce.OrderService.ErrorHandler;
+
+import org.springframework.http.HttpStatus;
+
+public class ErrorMessage {
+	
+	private String errorMessage;
+	private HttpStatus status;
+	public ErrorMessage(String errorMessage, HttpStatus status) {
+		super();
+		this.errorMessage = errorMessage;
+		this.status = status;
+	}
+	
+
+}

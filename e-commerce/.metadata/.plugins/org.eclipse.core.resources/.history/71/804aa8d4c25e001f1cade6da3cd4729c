@@ -1,0 +1,5 @@
+package com.e_commerce.ApiGateway.Controller;
+
+public class ApiGatewayController {
+
+}

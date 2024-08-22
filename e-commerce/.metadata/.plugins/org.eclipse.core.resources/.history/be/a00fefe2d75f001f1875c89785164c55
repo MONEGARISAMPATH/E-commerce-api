@@ -1,0 +1,25 @@
+package com.e_commerce.CartService.CartDto;
+
+import com.e_commerce.CartService.Entity.Cart;
+
+public class CartDto {
+	private Cart cart;
+	private String orderStatus;
+	public Cart getCart() {
+		return cart;
+	}
+	public void setCart(Cart cart) {
+		this.cart = cart;
+	}
+	public String getOrderStatus() {
+		return orderStatus;
+	}
+	public void setOrderStatus(String orderStatus) {
+		this.orderStatus = orderStatus;
+	}
+	
+	
+	
+	
+
+}

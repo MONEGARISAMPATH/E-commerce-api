@@ -1,0 +1,39 @@
+package com.e_commerce.PaymentService.Service;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.e_commerce.PaymentService.Clients.OrderServiceClient;
+import com.e_commerce.PaymentService.Entity.Payment;
+import com.e_commerce.PaymentService.PaymentDto.PaymentDto;
+import com.e_commerce.PaymentService.Repository.PaymentRepository;
+
+@Service
+public class PaymentService {
+	@Autowired
+	OrderServiceClient orderServiceClient;
+	@Autowired
+	PaymentRepository paymentRepository;
+	
+	public Payment createPayment(Payment payment) {
+		return paymentRepository.save(payment);
+		
+	}
+	public Optional<Payment> getPaymentById(Long id,Long OrderId ){
+		Optional<Payment> Optpayment=paymentRepository.findById(id);
+		if(Optpayment.isPresent()) {
+			Payment payment=Optpayment.get();
+			PaymentDto paymentdto=new PaymentDto();
+			paymentdto.setPayment(payment);
+			String Status=orderServiceClient.getOrderStatus(OrderId);
+			paymentdto.setOrderStatus(Status);
+			return paymentdto;
+		}else {
+			return Optional.empty();
+		}
+		
+	}
+
+}

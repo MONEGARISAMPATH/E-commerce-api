@@ -1,0 +1,8 @@
+package com.e_commerce.CartService.Entity;
+
+import jakarta.persistence.Entity;
+
+@Entity
+public class Cart {
+
+}

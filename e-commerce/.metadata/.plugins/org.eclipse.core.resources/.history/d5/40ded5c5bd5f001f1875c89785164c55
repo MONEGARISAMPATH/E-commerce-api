@@ -1,0 +1,100 @@
+package com.e_commerce.ProductService.ProductService;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.e_commerce.ProductService.Clients.OrderServiceClient;
+import com.e_commerce.ProductService.Entity.Product;
+import com.e_commerce.ProductService.ProductDto.ProductDto;
+import com.e_commerce.ProductService.Repository.ProductRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
+@Service
+public class ProductService {
+	private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
+	@Autowired
+	OrderServiceClient orderServiceClient;
+	@Autowired
+	ProductRepository productRepository;
+
+	public List<Product> getAllProducts() {
+		return productRepository.findAll();
+	}
+
+	public Product createProduct(Product product) {
+		return productRepository.save(product);
+	}
+
+	public Optional<Product> getProductById(Long id) {
+		Optional<Product> productId = productRepository.findById(id);
+		if (productId.isPresent()) {
+			Product product = productId.get();
+			return Optional.of(product);
+		} else {
+			logger.warn("User with ID {} not found", id);
+			return Optional.empty();
+		}
+	}
+
+	@CircuitBreaker(name = "productServiceOrderBreaker", fallbackMethod = "orderBreakerfallBackMethod")
+	public Optional<ProductDto> getProductById(Long id, Long orderId) {
+		Optional<Product> productId = productRepository.findById(id);
+		if (productId.isPresent()) {
+			Product product = productId.get();
+			ProductDto productDto = new ProductDto();
+			productDto.setProduct(product);
+
+			String status = orderServiceClient.getOrderStatus(orderId);
+			productDto.setOrderStatus(status);
+			return Optional.of(productDto);
+		} else {
+			logger.warn("User with ID {} not found", id);
+			return Optional.empty();
+		}
+	}
+
+	public Optional<ProductDto> orderBreakerfallBackMethod(Long id, Long orderId, Exception e) {
+		Optional<Product> productId = productRepository.findById(id);
+		if (productId.isPresent()) {
+			Product product = productId.get();
+			ProductDto productDto = new ProductDto();
+			productDto.setProduct(product);
+			productDto.setOrderStatus("Order status is unavailable");
+			return Optional.of(productDto);
+		} else {
+			logger.warn("User with ID {} not found", id);
+			return Optional.empty();
+		}
+	}
+
+	public Optional<Product> updateProduct(Long id, Product updateProduct) {
+		Optional<Product> excistId = productRepository.findById(id);
+		if (excistId.isPresent()) {
+			Product updatedProduct = excistId.get();
+			updatedProduct.setName(updateProduct.getName());
+			updatedProduct.setPrice(updateProduct.getPrice());
+			updatedProduct.setSlug(updateProduct.getSlug());
+			updatedProduct.setImgUrl(updateProduct.getImgUrl());
+			updatedProduct.setCreatedAt(updateProduct.getCreatedAt());
+			updatedProduct.setUpdatedAt(updateProduct.getUpdatedAt());
+			updatedProduct.setStock(updateProduct.getStock());
+			updatedProduct.setStatus(updateProduct.getStatus());
+			productRepository.save(updatedProduct);
+			return Optional.of(updatedProduct);
+		} else {
+			logger.warn("User with ID {} not found", id);
+			return Optional.empty();
+
+		}
+	}
+
+	public boolean deleteProduct(Long id) {
+		productRepository.deleteById(id);
+		return true;
+	}
+}

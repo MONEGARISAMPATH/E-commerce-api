@@ -1,0 +1,58 @@
+package com.e_commerce.OrderService.OrderController;
+
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.e_commerce.OrderService.ErrorHandler.ErrorMessage;
+import com.e_commerce.OrderService.OrderEntity.Order;
+import com.e_commerce.OrderService.OrderService.OrderService;
+
+import jakarta.validation.Valid;
+
+@RestController
+@RequestMapping("/orders")
+public class OrderController {
+	
+	private static final Logger logger=LoggerFactory.getLogger(OrderController.class);
+	@Autowired
+	OrderService orderService;
+
+	@PostMapping("/createOrder")
+	public ResponseEntity<Order> createOrder(@Valid @RequestBody Order order) {
+		return ResponseEntity.ok(orderService.createOrder(order));
+
+	}
+	
+	@GetMapping("/orderId/{orderId}")
+	public ResponseEntity<?> getOrderById(@PathVariable Long orderId){
+		Optional<Order> OrderId=orderService.getOrderById(orderId);
+		if(OrderId.isPresent()) {
+			Order order=OrderId.get();
+			return new ResponseEntity<>(order,HttpStatus.OK);
+		}else {
+			String errorMessage="OderId is not found: "+orderId;
+			logger.error("Error: {}  | Status: {}",errorMessage,HttpStatus.BAD_REQUEST);
+			ErrorMessage errorResponse=new ErrorMessage(errorMessage,HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(errorResponse,HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@GetMapping("/orderStatus/{orderId}")
+	
+public ResponseEntity<String> getOrderStatus(@PathVariable Long orderId){
+		String order=orderService.getOrderStatusById(orderId);
+		return new ResponseEntity<>(order,HttpStatus.OK);
+		
+	}
+}

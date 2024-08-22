@@ -1,0 +1,30 @@
+package com.e_commerce.CategoryService.Entity;
+
+import java.util.List;
+
+import com.e_commerce.CategoryService.Dto.ProductDto;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.NotBlank;
+
+@Entity
+public class Category {
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	private Long id;
+	
+	
+	@NotBlank(message="Name is mandatory")
+	private String name;
+	
+	@OneToMany
+	@JoinColumn(name="categoryId",referencedColumnName="id")
+	private List<ProductDto> product;
+	
+
+}

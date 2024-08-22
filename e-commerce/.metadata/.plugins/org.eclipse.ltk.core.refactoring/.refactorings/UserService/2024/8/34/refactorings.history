@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Copy element &apos;&apos; to &apos;com.e_commerce.UserService.Service.UserService.getAllUsers()&apos;&#x0D;&#x0A;- Original project: &apos;UserService&apos;&#x0D;&#x0A;- Destination element: &apos;com.e_commerce.UserService.Service.UserService.getAllUsers()&apos;&#x0D;&#x0A;- Original element: &apos;com.e_commerce.UserService.Service.UserService.getAllUsers()&apos;" description="Copy method" destination="/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.e_commerce.UserService.Service{UserService.java[UserService~getAllUsers" element1="/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.e_commerce.UserService.Service{UserService.java[UserService~getAllUsers" flags="589830" id="org.eclipse.jdt.ui.copy" members="1" policy="org.eclipse.jdt.ui.copyMembers" stamp="1724247469672" version="1.0"/>
+</session>

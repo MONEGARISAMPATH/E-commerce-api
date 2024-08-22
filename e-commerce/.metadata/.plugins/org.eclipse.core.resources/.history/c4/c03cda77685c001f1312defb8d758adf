@@ -1,0 +1,5 @@
+package com.e_commerce.UserService.Entity;
+
+public class ErrorResponse {
+
+}
